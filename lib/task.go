@@ -6,18 +6,16 @@ import (
 )
 
 func init() {
-	fmt.Println("Load task model")
+	fmt.Println("Initial task model")
 }
 
 type Handle func()
 
 type Task struct {
-	ppid int
-	pid  int
-	gid  int
-
-	sig chan int
-
+	ppid   int
+	pid    int
+	gid    int
+	sig    chan int
 	handle Handle
 }
 

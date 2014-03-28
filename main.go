@@ -7,7 +7,8 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
+	//"time"
+	"tracery/gs"
 	"tracery/lib"
 )
 
@@ -42,20 +43,15 @@ func main() {
 		fmt.Printf("key=%s,value=%v\n", k, v)
 	}
 
-	t, err := lib.NewTask(func() {
-		for {
-			select {
-			case <-time.After(time.Second * 5):
-				fmt.Println(APP_CONF)
-			}
-		}
-	})
+	task_gs, err := lib.NewTask(gs.DEF_HANDLE)
 	if err != nil {
 		fmt.Errorf("Init handle thread failed %v \n", err)
 		os.Exit(0)
 	}
 
-	lib.Run(t)
+	if gs_svr, err := gs.NewGS("GS", APP_CONF.AssertInt("gs.port"), 100, task_gs); err != nil {
+		lib.Run(gs_svr)
+	}
 
 	ch := make(chan os.Signal)
 	for {

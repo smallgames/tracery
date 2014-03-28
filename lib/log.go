@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+func init() {
+	fmt.Println("Initial log model")
+}
+
 const (
 	LOG_DEBUG = iota
 	LOG_INFO
@@ -21,15 +25,10 @@ var (
 	_level_str = []string{"DEBUG", "INFO ", "WARN ", "ERROR"}
 )
 
-func init() {
-	fmt.Println("Loaded log modle")
-}
-
 type Log struct {
 	Level int
 	Inner *log.Logger
-
-	file *os.File
+	file  *os.File
 }
 
 func NewLog(fs string, lv int) (*Log, error) {

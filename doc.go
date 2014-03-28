@@ -1,6 +1,6 @@
 // learn project doc.go
 
 /*
-learn document
+l document
 */
 package main
