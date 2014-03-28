@@ -2,6 +2,7 @@ package gs
 
 import (
 	"fmt"
+	"net"
 	"time"
 	"tracery/lib"
 )
@@ -28,12 +29,38 @@ func NewGS(p int, c int, t *lib.Task) (*GameServer, error) {
 }
 
 func (self *GameServer) Run() {
-	fmt.Println("gs start gogogo")
-	defer fmt.Println("gs end")
-	for {
-		select {
-		case <-time.After(time.Second * 5):
-			fmt.Println("hahah")
-		}
+	//fmt.Println("gs start gogogo")
+	//defer fmt.Println("gs end")
+
+	tcp, err := net.ResolveTCPAddr("tcp", fmt.Sprintf(":%d", self.Port))
+	if err != nil {
+		fmt.Errorf("port formatter err", err)
+		return
 	}
+
+	l, err := net.ListenTCP("tcp", tcp)
+	if err != nil {
+		fmt.Errorf("port formatter err", err)
+		return
+	}
+	defer l.Close()
+
+	for c, err := l.Accept(); err == nil; {
+		go init_user(&c)
+	}
+}
+
+type User struct {
+	conn     *net.Conn
+	lest_opt int64
+	token    string
+	secret   string
+}
+
+func init_user(c *net.Conn) (*User, error) {
+	u := &User{conn: c, lest_opt: time.Now().Unix(), token: "", secret: ""}
+	for {
+		c.Read()
+	}
+	return u, nil
 }

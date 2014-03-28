@@ -39,15 +39,16 @@ func main() {
 		fmt.Println(err)
 	}
 
-	for k, v := range APP_CONF.Stroes {
-		fmt.Printf("%s=%v\n", k, v)
-	}
+	//for k, v := range APP_CONF.Stroes {
+	//	fmt.Printf("%s=%v\n", k, v)
+	//}
 
 	task_gs, err := lib.NewTask("iGS")
 	if err != nil {
 		fmt.Errorf("Fork thread failed %v \n", err)
 		os.Exit(0)
 	}
+	//fmt.Println(task_gs)
 
 	if gs_svr, err := gs.NewGS(APP_CONF.AssertInt("gs.port"), 100, task_gs); err == nil {
 		go gs_svr.Run()
