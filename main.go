@@ -40,17 +40,20 @@ func main() {
 	}
 
 	for k, v := range APP_CONF.Stroes {
-		fmt.Printf("key=%s,value=%v\n", k, v)
+		fmt.Printf("%s=%v\n", k, v)
 	}
 
-	task_gs, err := lib.NewTask(gs.DEF_HANDLE)
+	task_gs, err := lib.NewTask("iGS")
 	if err != nil {
-		fmt.Errorf("Init handle thread failed %v \n", err)
+		fmt.Errorf("Fork thread failed %v \n", err)
 		os.Exit(0)
 	}
 
-	if gs_svr, err := gs.NewGS("GS", APP_CONF.AssertInt("gs.port"), 100, task_gs); err != nil {
-		lib.Run(gs_svr)
+	if gs_svr, err := gs.NewGS(APP_CONF.AssertInt("gs.port"), 100, task_gs); err == nil {
+		go gs_svr.Run()
+	} else {
+		fmt.Errorf("GS startup failed %v \n", err)
+		os.Exit(0)
 	}
 
 	ch := make(chan os.Signal)

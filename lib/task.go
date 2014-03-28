@@ -9,20 +9,19 @@ func init() {
 	fmt.Println("Initial task model")
 }
 
-type Handle func()
+type Runable interface {
+	Run()
+}
 
 type Task struct {
-	ppid   int
-	pid    int
-	gid    int
-	sig    chan int
-	handle Handle
+	Name string
+
+	ppid int
+	pid  int
+	gid  int
+	sig  chan int
 }
 
-func NewTask(h Handle) (*Task, error) {
-	return &Task{ppid: os.Getppid(), pid: os.Getpid(), gid: os.Getgid(), sig: make(chan int), handle: h}, nil
-}
-
-func Run(t *Task) {
-	go t.handle()
+func NewTask(n string) (*Task, error) {
+	return &Task{Name: n, ppid: os.Getppid(), pid: os.Getpid(), gid: os.Getgid(), sig: make(chan int)}, nil
 }
