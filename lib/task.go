@@ -11,32 +11,20 @@ func init() {
 
 type Handle func()
 
-type runable interface {
-	run(*Handle)
-}
-
 type Task struct {
 	ppid int
 	pid  int
 	gid  int
-	//live int64
 
 	sig chan int
+
+	handle Handle
 }
 
-func NewTask() (*Task, error) {
-	return &Task{ppid: os.Getppid(), pid: os.Getpid(), gid: os.Getgid(), sig: make(chan int)}, nil
+func NewTask(h Handle) (*Task, error) {
+	return &Task{ppid: os.Getppid(), pid: os.Getpid(), gid: os.Getgid(), sig: make(chan int), handle: h}, nil
 }
 
-func (self *Task) run(h Handle) {
-	//defer func() {
-	//	if r := recover(); r != nil {
-	//		fmt.Printf("pid:%v\n recover", self.pid)
-	//	}
-	//}()
-	go h()
-}
-
-func Fork(t *Task, h Handle) {
-	t.run(h)
+func Run(t *Task) {
+	go t.handle()
 }

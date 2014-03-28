@@ -3,13 +3,12 @@ package main
 
 import (
 	"fmt"
-	"learn/lib"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
-	//"regexp"
+	"tracery/lib"
 )
 
 var (
@@ -22,7 +21,6 @@ var (
 )
 
 func main() {
-
 	if len(strings.TrimSpace(GS_HOME)) < 1 {
 		GS_HOME, _ = os.Getwd()
 	}
@@ -35,20 +33,16 @@ func main() {
 
 	(*APP_LOG).Info("start load Configure...")
 
-	dir, _ := os.Getwd()
-	APP_CONF, err := lib.NewConf(dir + CONF_PATH)
+	APP_CONF, err := lib.NewConf(GS_HOME + CONF_PATH)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	t, err := lib.NewTask()
-	fmt.Println(t)
-	if err != nil {
-		fmt.Errorf("Init handle thread failed %v \n", err)
-		os.Exit(0)
+	for k, v := range APP_CONF.Stroes {
+		fmt.Printf("key=%s,value=%v\n", k, v)
 	}
 
-	lib.Fork(t, func() {
+	t, err := lib.NewTask(func() {
 		for {
 			select {
 			case <-time.After(time.Second * 5):
@@ -56,6 +50,12 @@ func main() {
 			}
 		}
 	})
+	if err != nil {
+		fmt.Errorf("Init handle thread failed %v \n", err)
+		os.Exit(0)
+	}
+
+	lib.Run(t)
 
 	ch := make(chan os.Signal)
 	for {
