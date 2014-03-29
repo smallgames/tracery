@@ -33,26 +33,27 @@ type Memcache interface {
 // byte of memcache begin
 type BytesMem struct {
 	//lock sync.RWMutex
-	data []byte
-	head *BytesMem
-	pre  *BytesMem
-	next *BytesMem
+	Name string
+	Data []byte
+	Head *BytesMem
+	Pre  *BytesMem
+	Next *BytesMem
 }
 
 func (self *BytesMem) Get() reflect.Value {
-	return reflect.ValueOf(self.data)
+	return reflect.ValueOf(self.Data)
 }
 func (self *BytesMem) Len() int {
-	return len(self.data)
+	return len(self.Data)
 }
 func (self *BytesMem) Append(m Memcache) error {
 	if p, ok := m.(*BytesMem); ok {
-		if self.next == nil {
-			self.next = p
-			p.pre = self
-			p.head = self.head
+		if self.Next == nil {
+			self.Next = p
+			p.Pre = self
+			p.Head = self.Head
 		} else {
-			self.next.Append(p)
+			self.Next.Append(p)
 		}
 		return nil
 	}
@@ -61,10 +62,22 @@ func (self *BytesMem) Append(m Memcache) error {
 }
 
 // share funcs begin
-func NewMem(mt int) (Memcache, error) {
+//func NewMem(mt int) (Memcache, error) {
+//	switch mt {
+//	case BYTES_MEM:
+//		return &BytesMem{Data: make([]byte, 1, 2)}, nil
+//	default:
+//		return nil, errors.New(fmt.Sprintf(err_unknow_type_str, mt))
+//	}
+//	return nil, err_not_same_type
+//}
+
+func NewMem(n string, mt int) (Memcache, error) {
 	switch mt {
 	case BYTES_MEM:
-		return &BytesMem{data: make([]byte, 1, 2)}, nil
+		this := &BytesMem{Name: n, Data: make([]byte, 1, 2)}
+		this.Head = this
+		return this, nil
 	default:
 		return nil, errors.New(fmt.Sprintf(err_unknow_type_str, mt))
 	}
