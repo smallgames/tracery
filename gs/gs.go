@@ -4,7 +4,7 @@ import (
 	//"bufio"
 	//"bytes"
 	"fmt"
-	//"io"
+	"io"
 	"net"
 	//"strings"
 	"time"
@@ -42,7 +42,7 @@ func (self *GameServer) Run() {
 		return
 	}
 
-	fmt.Printf("gs start listener %s", tcp.Network())
+	fmt.Printf("gs start listener %s", tcp)
 	l, err := net.ListenTCP("tcp", tcp)
 	if err != nil {
 		fmt.Errorf("port formatter err", err)
@@ -50,8 +50,13 @@ func (self *GameServer) Run() {
 	}
 	defer l.Close()
 
-	for c, err := l.Accept(); err == nil; {
-		go init_conn(&c)
+	for err == nil {
+		if c, err := l.Accept(); err == nil {
+			go init_conn(&c)
+		} else {
+			fmt.Println("gs accpet err=", err)
+		}
+
 	}
 }
 
@@ -64,21 +69,35 @@ type Client struct {
 
 func init_conn(c *net.Conn) (*Client, error) {
 	u := &Client{conn: c, lest_opt: time.Now().Unix(), token: "", secret: ""}
-	buf := make([]byte, 1024, 4096)
 
-	tot := 0
+	var (
+		n, o Memcache
+	)
+
+	n, err := NewMem(BYTES_MEM)
+	if err != nil {
+		return nil, (*c).Close()
+	}
 	for {
-		i, err := c.Read(buf)
-		tot += i
+		d := make([]byte, 1024, 4096)
+		i, err := (*c).Read(d)
 		if err != nil {
 			if err != io.EOF {
 				fmt.Println("init conn declear err ", err)
 			}
 			break
 		}
-		fmt.Print(i)
+		fmt.Println(i)
+		n.Set(d[:i])
+		if o != nil {
+			o.Append(n)
+		}
+		o = n
+		n, err = NewMem(BYTES_MEM)
+		if err != nil {
+			fmt.Println("create bm error", err)
+			break
+		}
 	}
-	fmt.Println(tot)
-	fmt.Println(fmt.Sprint(buf[:tot])
 	return u, nil
 }
