@@ -23,5 +23,5 @@ _testmain.go
 
 #Yate ignore list
 .DS_Store
-/log/*
+log/
 tracery
