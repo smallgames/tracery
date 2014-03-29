@@ -18,27 +18,41 @@ const (
 	LOG_WARN
 	LOG_ERROR
 
-	_formatter = `[%s] [%s] %s:%d - %s`
+	formatter = `[%s] [%s] %s:%d - %s`
 )
 
 var (
-	_level_str = []string{"DEBUG", "INFO ", "WARN ", "ERROR"}
+	LOG_MGR = make(map[string]*Log)
+
+	level_str = []string{"DEBUG", "INFO ", "WARN ", "ERROR"}
 )
 
 type Log struct {
 	Level int
 	Inner *log.Logger
-	file  *os.File
+
+	name string
+	file *os.File
 }
 
-func NewLog(fs string, lv int) (*Log, error) {
+func NewLog(name, fs string, lv int) (*Log, error) {
+	if v, ok := LOG_MGR[name]; ok {
+		fmt.Println(ok, v)
+		return v, nil
+	}
+
 	f, err := os.OpenFile(fs, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 
 	if err != nil {
 		return nil, err
 	}
-	l := log.New(f, "", 0644)
-	return &Log{Level: lv, Inner: l, file: f}, nil
+	l := log.New(f, fmt.Sprintf("%s>>>>>>\t", name), 0644)
+	return regiter_log(&Log{Level: lv, Inner: l, file: f, name: name})
+}
+
+func regiter_log(log *Log) (*Log, error) {
+	LOG_MGR[log.name] = log
+	return log, nil
 }
 
 func (self *Log) Close() {
@@ -89,5 +103,5 @@ func (self *Log) _write(msg string, lv int) {
 	}
 	file = short
 	t := time.Now().Format(time.RubyDate)
-	self.Inner.Println(fmt.Sprintf(_formatter, _level_str[lv], t, file, line, msg))
+	self.Inner.Println(fmt.Sprintf(formatter, level_str[lv], t, file, line, msg))
 }

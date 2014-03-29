@@ -64,21 +64,21 @@ type Client struct {
 
 func init_conn(c *net.Conn) (*Client, error) {
 	u := &Client{conn: c, lest_opt: time.Now().Unix(), token: "", secret: ""}
-	//buf := make([]byte, 1024, 4096)
+	buf := make([]byte, 1024, 4096)
 
-	//tot := 0
-	//for {
-	//	i, err := c.Read(buf)
-	//	tot += i
-	//	if err != nil {
-	//		if err != io.EOF {
-	//			fmt.Println("init conn declear err ", err)
-	//		}
-	//		break
-	//	}
-	//	fmt.Print(i)
-	//}
-	//fmt.Println(tot)
-	//fmt.Println(fmt.Sprint(buf[:tot])
+	tot := 0
+	for {
+		i, err := c.Read(buf)
+		tot += i
+		if err != nil {
+			if err != io.EOF {
+				fmt.Println("init conn declear err ", err)
+			}
+			break
+		}
+		fmt.Print(i)
+	}
+	fmt.Println(tot)
+	fmt.Println(fmt.Sprint(buf[:tot])
 	return u, nil
 }

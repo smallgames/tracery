@@ -16,6 +16,8 @@ func init() {
 }
 
 var (
+	CONF_MGR = make(map[string]*Conf)
+
 	err_key_is_nil = errors.New("Paramter key is empty")
 	key_not_exists = "Can not find the corresponding key[%s]."
 )
@@ -27,18 +29,11 @@ type Conf struct {
 }
 
 func NewConf(fs string) (*Conf, error) {
-	f, err := os.OpenFile(fs, os.O_RDONLY, 0644)
-	defer f.Close()
-	if err != nil {
-		return nil, err
+	if v, ok := CONF_MGR[fs]; ok {
+		return v, nil
 	}
-
-	stores, err := _init(f)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Conf{Last_Opt: time.Now(), File: fs, Stroes: stores}, nil
+	this := &Conf{Last_Opt: time.Now(), File: fs}
+	return this.load_conf()
 }
 
 func (self *Conf) Get(k string) (string, error) {
@@ -64,8 +59,14 @@ func (self *Conf) AssertInt(k string) int {
 	}
 }
 
-func _init(f *os.File) (map[string]string, error) {
+func (self *Conf) load_conf() (*Conf, error) {
 	val := make(map[string]string)
+
+	f, err := os.OpenFile(self.File, os.O_RDONLY, 0644)
+	defer f.Close()
+	if err != nil {
+		return nil, err
+	}
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
@@ -81,5 +82,11 @@ func _init(f *os.File) (map[string]string, error) {
 			val[k] = v
 		}
 	}
-	return val, nil
+	self.Stroes = val
+	return regiter_conf(self)
+}
+
+func regiter_conf(conf *Conf) (*Conf, error) {
+	CONF_MGR[conf.File] = conf
+	return conf, nil
 }
