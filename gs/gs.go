@@ -1,8 +1,12 @@
 package gs
 
 import (
+	//"bufio"
+	//"bytes"
 	"fmt"
+	//"io"
 	"net"
+	//"strings"
 	"time"
 	"tracery/lib"
 )
@@ -38,6 +42,7 @@ func (self *GameServer) Run() {
 		return
 	}
 
+	fmt.Printf("gs start listener %s", tcp.Network())
 	l, err := net.ListenTCP("tcp", tcp)
 	if err != nil {
 		fmt.Errorf("port formatter err", err)
@@ -46,21 +51,34 @@ func (self *GameServer) Run() {
 	defer l.Close()
 
 	for c, err := l.Accept(); err == nil; {
-		go init_user(&c)
+		go init_conn(&c)
 	}
 }
 
-type User struct {
+type Client struct {
 	conn     *net.Conn
 	lest_opt int64
 	token    string
 	secret   string
 }
 
-func init_user(c *net.Conn) (*User, error) {
-	u := &User{conn: c, lest_opt: time.Now().Unix(), token: "", secret: ""}
-	for {
-		c.Read()
-	}
+func init_conn(c *net.Conn) (*Client, error) {
+	u := &Client{conn: c, lest_opt: time.Now().Unix(), token: "", secret: ""}
+	//buf := make([]byte, 1024, 4096)
+
+	//tot := 0
+	//for {
+	//	i, err := c.Read(buf)
+	//	tot += i
+	//	if err != nil {
+	//		if err != io.EOF {
+	//			fmt.Println("init conn declear err ", err)
+	//		}
+	//		break
+	//	}
+	//	fmt.Print(i)
+	//}
+	//fmt.Println(tot)
+	//fmt.Println(fmt.Sprint(buf[:tot])
 	return u, nil
 }

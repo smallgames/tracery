@@ -12,6 +12,13 @@ import (
 	"tracery/lib"
 )
 
+const (
+	KB = 1 * 1024
+	MB = KB * 1024
+	GB = MB * 1024
+	TB = GB * 1024
+)
+
 var (
 	GS_HOME = os.Getenv("GS_HOME")
 
@@ -22,6 +29,18 @@ var (
 )
 
 func main() {
+	b1, _ := gs.NewMem(gs.BYTES_MEM)
+	b2, _ := gs.NewMem(gs.BYTES_MEM)
+	b3, _ := gs.NewMem(gs.BYTES_MEM)
+	b1.Append(b2)
+	b1.Append(b3)
+
+	fmt.Println(b1)
+	fmt.Println(b2)
+	fmt.Println(b3)
+
+	os.Exit(0)
+
 	if len(strings.TrimSpace(GS_HOME)) < 1 {
 		GS_HOME, _ = os.Getwd()
 	}
