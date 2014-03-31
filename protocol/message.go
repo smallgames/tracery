@@ -13,6 +13,7 @@ const (
 	NEW_PKG = iota
 	TCZ_PKG
 	FIN_PKG
+	INV_PKG
 	ERR_PKG
 )
 

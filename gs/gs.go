@@ -91,31 +91,38 @@ func (self *Client) receive() {
 				fmt.Println("init conn declear err ", err)
 			}
 			pkg.Mark = protocol.ERR_PKG
+			r.Read(make([]byte, r.Buffered()))
 			continue
 		}
 
 		body_len, err := strconv.Atoi(string(head[:len(head)-1]))
 		if err != nil {
 			pkg.Mark = protocol.ERR_PKG
+			r.Read(make([]byte, r.Buffered()))
 			continue
 		}
 
-		body := make([]byte, body_len+2)
-		i, err := r.Read(body)
+		body := make([]byte, body_len)
+		_, err = r.Read(body)
 		if err != nil {
 			if err != io.EOF {
 				fmt.Println("init conn declear err ", err)
 			}
 			pkg.Mark = protocol.ERR_PKG
-			break
+			r.Read(make([]byte, r.Buffered()))
+			continue
 		}
 
 		pkg.Head = head[:len(head)-1]
 		pkg.Body = body
 		pkg.Fin = time.Now()
+		pkg.Mark = protocol.FIN_PKG
 
-		fmt.Println(strings.TrimSpace(string(body)))
-		fmt.Println(i)
+		go self.handle(pkg)
+
+		r.Read(make([]byte, r.Buffered()))
+
+		fmt.Println("client>>>", strings.TrimSpace(string(body)))
 
 	}
 }
