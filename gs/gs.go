@@ -1,14 +1,16 @@
 package gs
 
 import (
-	//"bufio"
+	"bufio"
 	//"bytes"
 	"fmt"
 	"io"
 	"net"
-	//"strings"
+	"strconv"
+	"strings"
 	"time"
 	"tracery/lib"
+	"tracery/protocol"
 )
 
 func init() {
@@ -33,16 +35,13 @@ func NewGS(p int, c int, t *lib.Task) (*GameServer, error) {
 }
 
 func (self *GameServer) Run() {
-	//fmt.Println("gs start gogogo")
-	//defer fmt.Println("gs end")
-
 	tcp, err := net.ResolveTCPAddr("tcp", fmt.Sprintf(":%d", self.Port))
 	if err != nil {
 		fmt.Errorf("port formatter err", err)
 		return
 	}
 
-	fmt.Printf("gs start listener %s", tcp)
+	fmt.Printf("gs start listener %s\n", tcp)
 	l, err := net.ListenTCP("tcp", tcp)
 	if err != nil {
 		fmt.Errorf("port formatter err", err)
@@ -65,39 +64,76 @@ type Client struct {
 	lest_opt int64
 	token    string
 	secret   string
+	push     chan []byte
 }
 
 func init_conn(c *net.Conn) (*Client, error) {
-	u := &Client{conn: c, lest_opt: time.Now().Unix(), token: "", secret: ""}
+	u := &Client{conn: c, lest_opt: time.Now().Unix(), push: make(chan []byte, 64)}
+	go u.receive()
+	go u.send()
+	return u, nil
+}
 
-	var (
-		n, o Memcache
-	)
+func (self *Client) receive() {
 
-	n, err := NewMem(BYTES_MEM)
-	if err != nil {
-		return nil, (*c).Close()
-	}
+	pkg := &protocol.Message{Mark: protocol.NEW_PKG}
+	r := bufio.NewReader((*self.conn))
+
 	for {
-		d := make([]byte, 1024, 4096)
-		i, err := (*c).Read(d)
+		if pkg.Mark > 1 {
+			fmt.Println("receive new pkg")
+			pkg = &protocol.Message{Mark: protocol.NEW_PKG}
+		}
+
+		head, err := r.ReadSlice(byte('|'))
 		if err != nil {
 			if err != io.EOF {
 				fmt.Println("init conn declear err ", err)
 			}
+			pkg.Mark = protocol.ERR_PKG
+			continue
+		}
+
+		body_len, err := strconv.Atoi(string(head[:len(head)-1]))
+		if err != nil {
+			pkg.Mark = protocol.ERR_PKG
+			continue
+		}
+
+		body := make([]byte, body_len+2)
+		i, err := r.Read(body)
+		if err != nil {
+			if err != io.EOF {
+				fmt.Println("init conn declear err ", err)
+			}
+			pkg.Mark = protocol.ERR_PKG
 			break
+		}
+
+		pkg.Head = head[:len(head)-1]
+		pkg.Body = body
+		pkg.Fin = time.Now()
+
+		fmt.Println(strings.TrimSpace(string(body)))
+		fmt.Println(i)
+
+	}
+}
+
+func (self *Client) send() {
+	for {
+		wbs := <-self.push
+		fmt.Println("write msg :", string(wbs))
+		i, err := (*self.conn).Write(wbs)
+		if err != nil {
+			fmt.Println("send msg error :", err)
 		}
 		fmt.Println(i)
-		n.Set(d[:i])
-		if o != nil {
-			o.Append(n)
-		}
-		o = n
-		n, err = NewMem(BYTES_MEM)
-		if err != nil {
-			fmt.Println("create bm error", err)
-			break
-		}
 	}
-	return u, nil
+}
+
+func (self *Client) handle(p *protocol.Message) {
+	msg := strings.TrimSpace(string(p.Body))
+	fmt.Println(msg)
+	self.push <- p.Test()
 }
