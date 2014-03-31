@@ -2,7 +2,7 @@ package gs
 
 import (
 	"bufio"
-	//"bytes"
+	"bytes"
 	"fmt"
 	"io"
 	"net"
@@ -18,20 +18,30 @@ func init() {
 }
 
 var (
-	def_capacity = 200
+	gs_max_onlines = 1000
+	gs_max_rooms   = 5
 )
 
 type GameServer struct {
-	Port     int
-	Capacity int
-	SysInfo  *lib.Task
+	SysInfo *lib.Task
+	Port    int
+	Online  int
+	GRoom   []GameRoom
+
+	//clis map[string]*Client
 }
 
 func NewGS(p int, c int, t *lib.Task) (*GameServer, error) {
-	if def_capacity > c {
-		c = def_capacity
+	if gs_max_onlines > c {
+		c = gs_max_onlines
 	}
-	return &GameServer{Port: p, Capacity: c, SysInfo: t}, nil
+
+	grooms := make([]GameRoom)
+	for i := 0; i < gs_max_rooms; i++ {
+		grooms[i] = NewRoom("gr" + i)
+	}
+
+	return &GameServer{Port: p, Online: c, SysInfo: t, GRoom: grooms}, nil
 }
 
 func (self *GameServer) Run() {
@@ -140,7 +150,21 @@ func (self *Client) send() {
 }
 
 func (self *Client) handle(p *protocol.Message) {
-	msg := strings.TrimSpace(string(p.Body))
-	fmt.Println(msg)
-	self.push <- p.Test()
+	//msg := strings.TrimSpace(string(p.Body))
+	//fmt.Println(msg)
+	//fmt.Println(p.Body[0])
+	//fmt.Println(byte(protocol.LOGIN_PKG))
+	switch p.Body[0] {
+	case byte(protocol.LOGIN_PKG):
+		msg := strings.TrimSpace(string(p.Body[1:]))
+		fmt.Println(msg)
+		self.token = msg
+		self.secret = "succeed"
+		self.push <- bytes.NewBufferString("请选择大厅").Bytes()
+	case byte(protocol.GO_ROOMS_PKG):
+		msg := strings.TrimSpace(string(p.Body[1:]))
+		fmt.Println(msg)
+	default:
+		fmt.Println("Unknow package")
+	}
 }

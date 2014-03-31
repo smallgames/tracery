@@ -17,6 +17,11 @@ const (
 	ERR_PKG
 )
 
+const (
+	LOGIN_PKG    = 48
+	GO_ROOMS_PKG = 49
+)
+
 type Message struct {
 	Mark int
 	Fin  time.Time
