@@ -16,11 +16,11 @@ var ()
 
 type GameRoom struct {
 	Name string
-	Id   int
+	ID   int
 	Max  int
 	clis map[string]*Client
 }
 
-func NewRoom(n string, id int) *GameRoom {
-	return &GameRoom{Name: n, Max: gr_max_online, clis: make([string]*Client)}
+func NewRoom(n string, i int) *GameRoom {
+	return &GameRoom{Name: n, ID: i, Max: gr_max_online, clis: make(map[string]*Client)}
 }
