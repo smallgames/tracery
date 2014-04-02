@@ -33,6 +33,7 @@ func NewGSHandler(obj *GameServer) *GSHandler {
 func (self *GSHandler) handle(target *Client, p *protocol.Message) {
 	switch p.Body[0] {
 	case byte(protocol.LOGIN_PKG):
+		fmt.Println("Login PKG")
 		msg := strings.TrimSpace(string(p.Body[1:]))
 		fmt.Println(msg)
 		target.token = msg
