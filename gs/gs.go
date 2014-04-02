@@ -31,7 +31,7 @@ func NewGS(p int, c int, t *lib.Task) (*GameServer, error) {
 
 	grooms := make([]*GameRoom, gs_max_rooms)
 	for i := 0; i < gs_max_rooms; i++ {
-		grooms[i] = NewRoom(fmt.Sprintf("room_", i), i)
+		grooms[i] = NewRoom(fmt.Sprintf("room_%d", i), i)
 	}
 
 	return &GameServer{Port: p, Online: c, SysInfo: t, Rooms: grooms}, nil

@@ -38,7 +38,14 @@ func (self *GSHandler) handle(target *Client, p *protocol.Message) {
 		fmt.Println(msg)
 		target.token = msg
 		target.secret = "succeed"
-		target.push <- bytes.NewBufferString("请选择大厅").Bytes()
+
+		tocli := `{"rooms":[%s]}`
+		gr_arr := make([]string, len(self.Self.Rooms))
+		for i, v := range self.Self.Rooms {
+			gr_arr[i] = fmt.Sprintf(`{"id":%d,"name":"%v","max":%d}`, v.ID, v.Name, v.Max)
+		}
+		tocli = fmt.Sprintf(tocli, strings.Join(gr_arr, ","))
+		target.push <- bytes.NewBufferString("server>>>" + tocli).Bytes()
 	case byte(protocol.GO_ROOMS_PKG):
 		msg := strings.TrimSpace(string(p.Body[1:]))
 		fmt.Println(msg)

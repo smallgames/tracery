@@ -20,6 +20,7 @@ const (
 const (
 	LOGIN_PKG    = 48
 	GO_ROOMS_PKG = 49
+	//GET_ROOM_INFO
 )
 
 type Message struct {
