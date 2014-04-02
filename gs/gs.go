@@ -54,7 +54,7 @@ func (self *GameServer) Run() {
 
 	for err == nil {
 		if c, err := l.Accept(); err == nil {
-			go NewClient(&c)
+			go NewClient(&c, NewGSHandler(self))
 		} else {
 			fmt.Println("gs accpet err=", err)
 		}

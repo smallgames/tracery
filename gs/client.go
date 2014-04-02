@@ -3,7 +3,6 @@ package gs
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
 	"net"
@@ -23,10 +22,17 @@ type Client struct {
 	token    string
 	secret   string
 	push     chan []byte
+	handler  Handler
 }
 
-func NewClient(c *net.Conn) (*Client, error) {
-	u := &Client{conn: c, lest_opt: time.Now().Unix(), push: make(chan []byte, 64)}
+func NewClient(c *net.Conn, h Handler) (*Client, error) {
+	u := &Client{
+		conn:     c,
+		lest_opt: time.Now().Unix(),
+		push:     make(chan []byte, 64),
+		handler:  h,
+	}
+
 	go u.receive()
 	go u.send()
 	return u, nil
@@ -75,7 +81,7 @@ func (self *Client) receive() {
 		pkg.Fin = time.Now()
 		pkg.Mark = protocol.FIN_PKG
 
-		go self.handle(pkg)
+		go self.handler.handle(self, pkg)
 
 		r.Read(make([]byte, r.Buffered()))
 
@@ -93,25 +99,5 @@ func (self *Client) send() {
 			fmt.Println("send msg error :", err)
 		}
 		fmt.Println(i)
-	}
-}
-
-func (self *Client) handle(p *protocol.Message) {
-	//msg := strings.TrimSpace(string(p.Body))
-	//fmt.Println(msg)
-	//fmt.Println(p.Body[0])
-	//fmt.Println(byte(protocol.LOGIN_PKG))
-	switch p.Body[0] {
-	case byte(protocol.LOGIN_PKG):
-		msg := strings.TrimSpace(string(p.Body[1:]))
-		fmt.Println(msg)
-		self.token = msg
-		self.secret = "succeed"
-		self.push <- bytes.NewBufferString("请选择大厅").Bytes()
-	case byte(protocol.GO_ROOMS_PKG):
-		msg := strings.TrimSpace(string(p.Body[1:]))
-		fmt.Println(msg)
-	default:
-		fmt.Println("Unknow package")
 	}
 }

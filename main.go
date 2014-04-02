@@ -65,19 +65,23 @@ func main() {
 		select {
 		case sig := <-ch:
 			fmt.Println("Server receives the signal(%v) will now exit.", sig)
-			break
+
+			switch sig {
+			case syscall.SIGHUP:
+				fmt.Println("get sighup\n") //Utils.LogInfo是我自己封装的输出信息函数
+			case syscall.SIGINT:
+				os.Exit(1)
+
+			case syscall.SIGQUIT:
+				fmt.Println("收到退出信号，准备退出")
+			case syscall.SIGUSR1:
+				fmt.Println("usr1\n")
+			case syscall.SIGUSR2:
+				fmt.Println("usr2\n")
+			default:
+				fmt.Printf("get sig=%v\n", sig)
+			}
 		}
-		//switch sig {
-		//default:
-		//	fmt.Println("get sig=%v\n", sig)
-		//case syscall.SIGHUP:
-		//	fmt.Println("get sighup\n") //Utils.LogInfo是我自己封装的输出信息函数
-		//case syscall.SIGINT:
-		//	os.Exit(1)
-		//case syscall.SIGUSR1:
-		//	fmt.Println("usr1\n")
-		//case syscall.SIGUSR2:
-		//	fmt.Println("usr2\n")
-		//}
+
 	}
 }
