@@ -1,12 +1,9 @@
 package protocol
 
-import (
-	"fmt"
-	"time"
-)
+import "time"
 
 func init() {
-	fmt.Println("load msg model")
+	//fmt.Println("load msg model")
 }
 
 const (

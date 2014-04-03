@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	fmt.Println("load gs.handler model")
+	//fmt.Println("load gs.handler model")
 }
 
 const ()

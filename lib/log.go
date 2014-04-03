@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	fmt.Println("Initial log model")
+	//fmt.Println("Initial log model")
 }
 
 const (

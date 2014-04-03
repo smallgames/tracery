@@ -1,11 +1,7 @@
 package gs
 
-import (
-	"fmt"
-)
-
 func init() {
-	fmt.Println("load gs.groom model")
+	//fmt.Println("load gs.groom model")
 }
 
 const (

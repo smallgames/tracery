@@ -1,11 +1,7 @@
 package gs
 
-import (
-	"fmt"
-)
-
 func init() {
-	fmt.Println("load nexus model")
+	//fmt.Println("load nexus model")
 }
 
 type Nexus struct {

@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	fmt.Println("load memcache model")
+	//fmt.Println("load memcache model")
 }
 
 const (

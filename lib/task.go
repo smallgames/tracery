@@ -1,12 +1,9 @@
 package lib
 
-import (
-	"fmt"
-	"os"
-)
+import "os"
 
 func init() {
-	fmt.Println("Initial task model")
+	//fmt.Println("Initial task model")
 }
 
 type Runable interface {

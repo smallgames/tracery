@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	fmt.Println("Initial gs model")
+	//fmt.Println("Initial gs model")
 }
 
 var (

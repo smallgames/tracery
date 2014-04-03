@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	fmt.Println("load client model")
+	//fmt.Println("load client model")
 }
 
 type Client struct {

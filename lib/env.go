@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	fmt.Println("Initial env model")
+	//fmt.Println("Initial env model")
 }
 
 var (
