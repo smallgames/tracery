@@ -3,13 +3,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
-	//"time"
+	"time"
 	"tracery/gs"
 	"tracery/lib"
+
+	"github.com/amqp"
 )
 
 const (
@@ -26,6 +29,68 @@ var (
 )
 
 func main() {
+
+	//amqp begin
+	mqconn, err := amqp.Dial("amqp://guest:guest@192.168.56.101:5672/")
+	if err != nil {
+		fmt.Errorf("Dial: %s", err)
+	}
+	defer mqconn.Close()
+
+	channel, err := mqconn.Channel()
+	if err != nil {
+		fmt.Errorf("Channel: %s", err)
+	}
+
+	if err := channel.ExchangeDeclare(
+		"yate_ex1", // name
+		"direct",   // type direct|fanout|topic|x-custom
+		true,       // durable
+		false,      // auto-deleted
+		false,      // internal
+		false,      // noWait
+		nil,        // arguments
+	); err != nil {
+		fmt.Errorf("Exchange Declare: %s", err)
+	}
+
+	if err := channel.Confirm(false); err != nil {
+		fmt.Errorf("Channel could not be put into confirm mode: %s", err)
+	}
+
+	ack, nack := channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
+
+	for {
+
+		if err = channel.Publish(
+			"yate_ex1", // publish to an exchange
+			"yate_rk",  // routing to 0 or more queues
+			false,      // mandatory
+			false,      // immediate
+			amqp.Publishing{
+				Headers:         amqp.Table{},
+				ContentType:     "text/plain",
+				ContentEncoding: "",
+				Body:            []byte("yate_test_mq"),
+				DeliveryMode:    amqp.Persistent, // 1=non-persistent, 2=persistent
+				Priority:        0,               // 0-9
+				// a bunch of application/implementation-specific fields
+			},
+		); err != nil {
+			fmt.Errorf("Exchange Publish: %s", err)
+		}
+
+		select {
+		case tag := <-ack:
+			log.Printf("confirmed delivery with delivery tag: %d", tag)
+		case tag := <-nack:
+			log.Printf("failed delivery of delivery tag: %d", tag)
+		}
+
+		time.Sleep(5 * time.Second)
+	}
+	os.Exit(0)
+
 	if len(strings.TrimSpace(GS_HOME)) < 1 {
 		GS_HOME, _ = os.Getwd()
 	}
