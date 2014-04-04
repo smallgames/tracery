@@ -45,7 +45,7 @@ func (self *GSHandler) handle(target *Client, p *protocol.Message) {
 			gr_arr[i] = fmt.Sprintf(`{"id":%d,"name":"%v","max":%d}`, v.ID, v.Name, v.Max)
 		}
 		tocli = fmt.Sprintf(tocli, strings.Join(gr_arr, ","))
-		target.push <- bytes.NewBufferString("server>>>" + tocli).Bytes()
+		target.Push <- bytes.NewBufferString("server>>>" + tocli).Bytes()
 	case byte(protocol.GO_ROOMS_PKG):
 		msg := strings.TrimSpace(string(p.Body[1:]))
 		fmt.Println(msg)
@@ -67,5 +67,5 @@ func NewGRHandler(obj *GameRoom) *GRHandler {
 
 func (self *GRHandler) handle(target *Client, p *protocol.Message) {
 	fmt.Println("GameRoom handler analyse body :", string(p.Body))
-	target.push <- p.Body
+	target.Push <- p.Body
 }

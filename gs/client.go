@@ -17,11 +17,12 @@ func init() {
 }
 
 type Client struct {
+	Push chan []byte
+
 	conn     *net.Conn
 	lest_opt int64
 	token    string
 	secret   string
-	push     chan []byte
 	handler  Handler
 }
 
@@ -29,7 +30,7 @@ func NewClient(c *net.Conn, h Handler) (*Client, error) {
 	u := &Client{
 		conn:     c,
 		lest_opt: time.Now().Unix(),
-		push:     make(chan []byte, 64),
+		Push:     make(chan []byte, 64),
 		handler:  h,
 	}
 
@@ -92,7 +93,7 @@ func (self *Client) receive() {
 
 func (self *Client) send() {
 	for {
-		wbs := <-self.push
+		wbs := <-self.Push
 		fmt.Println("write msg :", string(wbs))
 		i, err := (*self.conn).Write(wbs)
 		if err != nil {
