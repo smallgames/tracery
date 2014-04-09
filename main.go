@@ -3,16 +3,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 	"tracery/gs"
 	"tracery/lib"
-
-	"github.com/amqp"
 )
 
 const (
@@ -30,66 +26,97 @@ var (
 
 func main() {
 
-	//amqp begin
-	mqconn, err := amqp.Dial("amqp://guest:guest@192.168.56.101:5672/")
-	if err != nil {
-		fmt.Errorf("Dial: %s", err)
-	}
-	defer mqconn.Close()
+	var buf = make([]byte, 0)
+	tv := 130
 
-	channel, err := mqconn.Channel()
-	if err != nil {
-		fmt.Errorf("Channel: %s", err)
-	}
-
-	if err := channel.ExchangeDeclare(
-		"yate_ex1", // name
-		"direct",   // type direct|fanout|topic|x-custom
-		true,       // durable
-		false,      // auto-deleted
-		false,      // internal
-		false,      // noWait
-		nil,        // arguments
-	); err != nil {
-		fmt.Errorf("Exchange Declare: %s", err)
-	}
-
-	if err := channel.Confirm(false); err != nil {
-		fmt.Errorf("Channel could not be put into confirm mode: %s", err)
-	}
-
-	ack, nack := channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
-
-	for {
-
-		if err = channel.Publish(
-			"yate_ex1", // publish to an exchange
-			"yate_rk",  // routing to 0 or more queues
-			false,      // mandatory
-			false,      // immediate
-			amqp.Publishing{
-				Headers:         amqp.Table{},
-				ContentType:     "text/plain",
-				ContentEncoding: "",
-				Body:            []byte("yate_test_mq"),
-				DeliveryMode:    amqp.Persistent, // 1=non-persistent, 2=persistent
-				Priority:        0,               // 0-9
-				// a bunch of application/implementation-specific fields
-			},
-		); err != nil {
-			fmt.Errorf("Exchange Publish: %s", err)
+	for tv > 0 {
+		v1 := tv % 128
+		if tv < 128 {
+			fmt.Println("x", v1)
+			buf = append(buf, byte(v1))
+			break
+		} else {
+			fmt.Println("y", v1)
+			buf = append(buf, byte(v1+128))
 		}
-
-		select {
-		case tag := <-ack:
-			log.Printf("confirmed delivery with delivery tag: %d", tag)
-		case tag := <-nack:
-			log.Printf("failed delivery of delivery tag: %d", tag)
-		}
-
-		time.Sleep(5 * time.Second)
+		tv = tv / 128
 	}
+
+	fmt.Println(buf)
+
+	n := 0
+	for i := len(buf); i > 0; i-- {
+		fmt.Println(i, "=", buf[i-1])
+		if buf[i-1]&128 != 128 {
+			fmt.Println(buf[i-1], "=?")
+			n = 128*n + int(buf[i-1])
+		} else {
+			fmt.Println(buf[i-1], "=!")
+			b := buf[i-1] & 127
+			fmt.Println(b, "bbb")
+			n = 128*n + int(b)
+			println("de:", n)
+		}
+	}
+
 	os.Exit(0)
+
+	//amqp begin
+	//mqconn, err := amqp.Dial("amqp://guest:guest@192.168.56.101:5672/")
+	//if err != nil {
+	//	fmt.Errorf("Dial: %s", err)
+	//}
+	//defer mqconn.Close()
+
+	//channel, err := mqconn.Channel()
+	//if err != nil {
+	//	fmt.Errorf("Channel: %s", err)
+	//}
+
+	//if err := channel.ExchangeDeclare(
+	//	"yate_ex1", // name
+	//	"direct",   // type direct|fanout|topic|x-custom
+	//	true,       // durable
+	//	false,      // auto-deleted
+	//	false,      // internal
+	//	false,      // noWait
+	//	nil,        // arguments
+	//); err != nil {
+	//	fmt.Errorf("Exchange Declare: %s", err)
+	//}
+
+	//if err := channel.Confirm(false); err != nil {
+	//	fmt.Errorf("Channel could not be put into confirm mode: %s", err)
+	//}
+	//ack, nack := channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
+
+	//for {
+	//	if err = channel.Publish(
+	//		"yate_ex1", // publish to an exchange
+	//		"yate_rk",  // routing to 0 or more queues
+	//		false,      // mandatory
+	//		false,      // immediate
+	//		amqp.Publishing{
+	//			Headers:         amqp.Table{},
+	//			ContentType:     "text/plain",
+	//			ContentEncoding: "",
+	//			Body:            []byte("yate_test_mq"),
+	//			DeliveryMode:    amqp.Persistent, // 1=non-persistent, 2=persistent
+	//			Priority:        0,               // 0-9
+	//			// a bunch of application/implementation-specific fields
+	//		},
+	//	); err != nil {
+	//		fmt.Errorf("Exchange Publish: %s", err)
+	//	}
+	//	select {
+	//	case tag := <-ack:
+	//		log.Printf("confirmed delivery with delivery tag: %d", tag)
+	//	case tag := <-nack:
+	//		log.Printf("failed delivery of delivery tag: %d", tag)
+	//	}
+	//	time.Sleep(5 * time.Second)
+	//}
+	//os.Exit(0)
 
 	if len(strings.TrimSpace(GS_HOME)) < 1 {
 		GS_HOME, _ = os.Getwd()

@@ -33,6 +33,7 @@ func NewClient(c *net.Conn, h Handler) (*Client, error) {
 		Push:     make(chan []byte, 64),
 		handler:  h,
 	}
+	fmt.Fprint(*c, "> ")
 
 	go u.receive()
 	go u.send()
@@ -49,35 +50,42 @@ func (self *Client) receive() {
 			pkg = &protocol.Message{Mark: protocol.NEW_PKG}
 		}
 
-		head, err := r.ReadSlice(byte('|'))
+		datas, err := r.ReadBytes('\n')
 		if err != nil {
+			fmt.Println("11111")
+			fmt.Println(err)
 			if err != io.EOF {
 				fmt.Println("init conn declear err ", err)
+				(*self.conn).Close()
+				break
 			}
 			pkg.Mark = protocol.ERR_PKG
 			r.Read(make([]byte, r.Buffered()))
 			continue
 		}
 
-		body_len, err := strconv.Atoi(string(head[:len(head)-1]))
+		body_len, err := strconv.Atoi(string(datas[:1]))
 		if err != nil {
+			fmt.Println("22222")
 			pkg.Mark = protocol.ERR_PKG
 			r.Read(make([]byte, r.Buffered()))
 			continue
 		}
 
-		body := make([]byte, body_len)
-		_, err = r.Read(body)
+		body := datas[1:body_len]
 		if err != nil {
+			fmt.Println("33333")
 			if err != io.EOF {
 				fmt.Println("init conn declear err ", err)
+				(*self.conn).Close()
+				break
 			}
 			pkg.Mark = protocol.ERR_PKG
 			r.Read(make([]byte, r.Buffered()))
 			continue
 		}
 
-		pkg.Head = head[:len(head)-1]
+		pkg.Head = datas[1:len(datas)]
 		pkg.Body = body
 		pkg.Fin = time.Now()
 		pkg.Mark = protocol.FIN_PKG
@@ -87,7 +95,7 @@ func (self *Client) receive() {
 		r.Read(make([]byte, r.Buffered()))
 
 		fmt.Println("client>>>", strings.TrimSpace(string(body)))
-
+		fmt.Fprint((*self.conn), "> ")
 	}
 }
 
