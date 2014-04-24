@@ -50,7 +50,9 @@ func (self *Client) receive() {
 			pkg = &protocol.Message{Mark: protocol.NEW_PKG}
 		}
 
-		datas, err := r.ReadBytes('\n')
+		datas, prefix, err := r.ReadLine()
+		fmt.Println("p:", prefix)
+		fmt.Println("d:", string(datas))
 		if err != nil {
 			fmt.Println("11111")
 			fmt.Println(err)
@@ -65,6 +67,7 @@ func (self *Client) receive() {
 		}
 
 		body_len, err := strconv.Atoi(string(datas[:1]))
+		fmt.Println("body_len:", body_len)
 		if err != nil {
 			fmt.Println("22222")
 			pkg.Mark = protocol.ERR_PKG
@@ -73,6 +76,7 @@ func (self *Client) receive() {
 		}
 
 		body := datas[1:body_len]
+		fmt.Println("body:", string(body))
 		if err != nil {
 			fmt.Println("33333")
 			if err != io.EOF {

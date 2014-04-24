@@ -24,42 +24,10 @@ var (
 	CONF_PATH = "/conf/app.conf"
 )
 
+type A struct {
+}
+
 func main() {
-
-	var buf = make([]byte, 0)
-	tv := 130
-
-	for tv > 0 {
-		v1 := tv % 128
-		if tv < 128 {
-			fmt.Println("x", v1)
-			buf = append(buf, byte(v1))
-			break
-		} else {
-			fmt.Println("y", v1)
-			buf = append(buf, byte(v1+128))
-		}
-		tv = tv / 128
-	}
-
-	fmt.Println(buf)
-
-	n := 0
-	for i := len(buf); i > 0; i-- {
-		fmt.Println(i, "=", buf[i-1])
-		if buf[i-1]&128 != 128 {
-			fmt.Println(buf[i-1], "=?")
-			n = 128*n + int(buf[i-1])
-		} else {
-			fmt.Println(buf[i-1], "=!")
-			b := buf[i-1] & 127
-			fmt.Println(b, "bbb")
-			n = 128*n + int(b)
-			println("de:", n)
-		}
-	}
-
-	os.Exit(0)
 
 	//amqp begin
 	//mqconn, err := amqp.Dial("amqp://guest:guest@192.168.56.101:5672/")
@@ -128,8 +96,6 @@ func main() {
 	//	fmt.Println("c log e:", err)
 	//}
 
-	//(*log).Info("start load Configure...")
-
 	conf, err := lib.NewConf(GS_HOME + CONF_PATH)
 	if err != nil {
 		fmt.Println(err)
@@ -140,8 +106,6 @@ func main() {
 		fmt.Errorf("Fork thread failed %v \n", err)
 		os.Exit(0)
 	}
-
-	//(*log).Info("start load gs...")
 
 	if gs_svr, err := gs.NewGS(conf.AssertInt("gs.port"), 100, task_gs); err == nil {
 		go gs_svr.Run()
@@ -163,7 +127,6 @@ func main() {
 				fmt.Println("get sighup\n") //Utils.LogInfo是我自己封装的输出信息函数
 			case syscall.SIGINT:
 				os.Exit(1)
-
 			case syscall.SIGQUIT:
 				fmt.Println("收到退出信号，准备退出")
 			case syscall.SIGUSR1:

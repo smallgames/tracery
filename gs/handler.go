@@ -48,7 +48,7 @@ func (self *GSHandler) handle(target *Client, p *protocol.Message) {
 		target.Push <- bytes.NewBufferString("server>>>" + tocli).Bytes()
 	case byte(protocol.GO_ROOMS_PKG):
 		msg := strings.TrimSpace(string(p.Body[1:]))
-		fmt.Println(msg)
+		fmt.Println("???", msg)
 	default:
 		fmt.Println("Unknow package")
 	}
