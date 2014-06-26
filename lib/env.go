@@ -72,7 +72,7 @@ func (self *Conf) load_conf() (*Conf, error) {
 	for scanner.Scan() {
 		l := scanner.Text()
 		if ok, err := regexp.MatchString("(^\\s*#)", l); err != nil || ok {
-			fmt.Println("read conf skip lien : ", l)
+			//fmt.Println("read conf skip lien : ", l)
 			continue
 		}
 		arr := strings.Split(l, "=")

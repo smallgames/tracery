@@ -1,0 +1,16 @@
+package controllers
+
+import (
+	"github.com/astaxie/beego"
+)
+
+type HomeController struct {
+	beego.Controller
+}
+
+func (this *HomeController) Get() {
+	this.Data["Website"] = "beego.me"
+	this.Data["Email"] = "astaxie@gmail.com"
+	this.Data["test"] = "yate@golang.com"
+	this.TplNames = "home.html"
+}

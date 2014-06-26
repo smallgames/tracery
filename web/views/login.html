@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>雅特的主页</title>
+<meta charset="utf-8">
+<meta name="description" content="yate's blogger">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="/static/js/jquery-2.1.1.min.js"></script>
+<script src="/static/js/unslider/unslider.js"></script>
+<style>
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+#top {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	min-width: 480px;
+	z-index: 99999;
+	background: none repeat scroll 0% 0% #222;
+}
+
+#top .left {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+#top .left li {
+	float: left;
+	width: 80px;
+	text-align: center;
+	line-height: 30px;
+	text-align: center;
+}
+
+#top .left li a {
+	display: block;
+	height: 30px;
+	color: white;
+}
+
+#top .left li a:link {
+	color: #666;
+}
+
+#top .left li a:visited {
+	color: #666;
+	text-decoration: underline;
+}
+
+#top .left li a:hover {
+	color: #FFF;
+}
+
+header {
+	clear: both;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* header .title {
+	margin: 32px 0px 0px 0px;
+	padding: 0;
+	font-size: 2.769em;
+	font-weight: bold;
+	letter-spacing: -0.03em;
+}
+
+header .title img {
+	max-width: 250px;
+} */
+nav {
+	clear: both;
+}
+
+nav ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+nav ul li {
+	float: left;
+	width: 80px;
+	text-align: center;
+	line-height: 30px;
+}
+
+section {
+	clear: both;
+}
+
+section * {
+	margin: 0px;
+	padding: 0px;
+}
+
+footer {
+	clear: both;
+}
+
+footer * {
+	margin: 0px;
+	padding: 0px;
+}
+</style>
+</head>
+<body>
+	<header>
+		<H1>Beego login</H1>
+	</header>
+
+	<div>
+		<form action="/admin/login" method="post">
+		<label for="username">UserName:</label>
+		<input type="text" id="username" name="username">
+		<label for="password">Password:</label>
+		<input type="text" id="password" name="password">
+		<input type="submit">
+		</form>
+	</div>
+
+	<footer>
+		<div>
+			<p>
+				Design by: <a href="#">Yate</a>
+			</p>
+		</div>
+	</footer>
+</body>
+</html>

@@ -3,7 +3,6 @@ package lib
 import "os"
 
 func init() {
-	//fmt.Println("Initial task model")
 }
 
 type Runable interface {

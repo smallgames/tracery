@@ -3,7 +3,6 @@ package gs
 import (
 	"fmt"
 	"net"
-	"tracery/lib"
 )
 
 func init() {
@@ -16,15 +15,12 @@ var (
 )
 
 type GameServer struct {
-	SysInfo *lib.Task
-	Port    int
-	Online  int
-	Rooms   []*GameRoom
-
-	//clis map[string]*Client
+	Port   int
+	Online int
+	Rooms  []*GameRoom
 }
 
-func NewGS(p int, c int, t *lib.Task) (*GameServer, error) {
+func NewGS(p, c int) (*GameServer, error) {
 	if gs_max_onlines > c {
 		c = gs_max_onlines
 	}
@@ -34,21 +30,19 @@ func NewGS(p int, c int, t *lib.Task) (*GameServer, error) {
 		grooms[i] = NewRoom(fmt.Sprintf("room_%d", i), i)
 	}
 
-	return &GameServer{Port: p, Online: c, SysInfo: t, Rooms: grooms}, nil
+	return &GameServer{Port: p, Online: c, Rooms: grooms}, nil
 }
 
 func (self *GameServer) Run() {
 	tcp, err := net.ResolveTCPAddr("tcp", fmt.Sprintf(":%d", self.Port))
 	if err != nil {
-		fmt.Errorf("port formatter err", err)
-		return
+		panic(err)
 	}
 
 	fmt.Printf("gs start listener %s\n", tcp)
 	l, err := net.ListenTCP("tcp", tcp)
 	if err != nil {
-		fmt.Errorf("port formatter err", err)
-		return
+		panic(err)
 	}
 	defer l.Close()
 

@@ -1,0 +1,295 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>雅特的主页</title>
+<meta charset="utf-8">
+<meta name="description" content="yate's blogger">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="/static/js/jquery-2.1.1.min.js"></script>
+<script src="/static/js/unslider/unslider.js"></script>
+<style>
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+#top {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	min-width: 480px;
+	z-index: 99999;
+	background: none repeat scroll 0% 0% #222;
+}
+
+#top .left {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+#top .left li {
+	float: left;
+	width: 80px;
+	text-align: center;
+	line-height: 30px;
+	text-align: center;
+}
+
+#top .left li a {
+	display: block;
+	height: 30px;
+	color: white;
+}
+
+#top .left li a:link {
+	color: #666;
+}
+
+#top .left li a:visited {
+	color: #666;
+	text-decoration: underline;
+}
+
+#top .left li a:hover {
+	color: #FFF;
+}
+
+header {
+	clear: both;
+	margin:0px;
+	padding: 0px;
+}
+
+/* header .title {
+	margin: 32px 0px 0px 0px;
+	padding: 0;
+	font-size: 2.769em;
+	font-weight: bold;
+	letter-spacing: -0.03em;
+}
+
+header .title img {
+	max-width: 250px;
+} */
+
+nav {
+	clear: both;
+}
+
+nav ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+nav ul li {
+	float: left;
+	width: 80px;
+	text-align: center;
+	line-height: 30px;
+}
+
+section {
+	clear: both;
+}
+
+section * {
+	margin: 0px;
+	padding: 0px;
+}
+
+footer {
+	clear: both;
+}
+
+footer * {
+	margin: 0px;
+	padding: 0px;
+}
+</style>
+<style type="text/css">
+.banner {
+	position: relative;
+	overflow: auto;
+}
+
+.banner li {
+	list-style: none;
+}
+
+.banner ul li {
+	float: left;
+}
+</style>
+<script type="text/javascript">
+	$(function() {
+		$('.banner').unslider({
+			speed : 500, //  The speed to animate each slide (in milliseconds)
+			delay : 3000, //  The delay between slide animations (in milliseconds)
+			complete : function() {
+			}, //  A function that gets called after every slide animation
+			keys : true, //  Enable keyboard (left, right) arrow shortcuts
+			dots : true, //  Display dot navigation
+			fluid : false
+		//  Support responsive design. May break non-responsive designs
+		});
+	});
+</script>
+</head>
+<body>
+	<!-- <div id="top">
+		<ul class="left">
+			<li><a href="#">工具栏1</a></li>
+			<li><a href="#">工具栏2</a></li>
+			<li><a href="#">工具栏3</a></li>
+			<li><a href="#">工具栏4</a></li>
+		</ul>
+	</div> -->
+
+
+	<header>
+		<!-- <p class="title">
+			<a href="#">雅特的主页</a>
+		</p> -->
+		<div class="banner">
+			<ul style="width: 400%; position: relative; left: 0%; height: 415px;margin: 0px;padding: 0px;">
+				<li style="background-image: url(/static/img/gallery/1.jpg); width: 25%;">
+					<div class="inner">
+						<h1>The jQuery slider that just slides.</h1>
+						<p>{{.test}}</p>
+					</div>
+				</li>
+
+				<li style="background-image: url(/static/img/gallery/2.jpg); width: 25%;">
+					<div class="inner">
+						<h1>Fluid, flexible, fantastically minimal.</h1>
+						<p>Use any HTML in your slides, extend with CSS. You have full
+							control.</p>
+					</div>
+				</li>
+
+				<li style="background-image: url(/static/img/gallery/3.jpg); width: 25%;">
+					<div class="inner">
+						<h1>开源</h1>
+						<p>Unslider的所有源码都托管在GitHub上。</p>
+					</div>
+				</li>
+
+				<li style="background-image: url(/static/img/gallery/4.jpg); width: 25%;">
+					<div class="inner">
+						<h1>Uh, that’s about it.</h1>
+						<p>I just wanted to show you another slide.</p>
+					</div>
+				</li>
+			</ul>
+			<ol class="dots">
+				<li class="dot active">1</li>
+				<li class="dot">2</li>
+				<li class="dot">3</li>
+				<li class="dot">4</li>
+			</ol>
+		</div>
+	</header>
+
+	<nav>
+		<ul>
+			<li><a href="#">首页</a></li>
+			<li><a href="#">日志</a></li>
+			<li><a href="#">相册</a></li>
+			<li><a href="#">里程碑</a></li>
+		</ul>
+	</nav>
+
+
+	<section>
+		<div>
+			<div>
+
+				<!-- Start: Post -->
+				<article>
+					<p>发表于:2013/09/12</p>
+					<h2>
+						<a href="#">文章标题你知道是什么吗？</a>
+					</h2>
+					<p>大部分行业干得好的人主要都是靠自学。只不过多数专业的自学都需要一定条件，非相关专业的人难以获得这些条件，所以自学而有所成就的主要是该专业的人，跨专业自学成功的不多。这就容易让大家忽略那些成功者的自学。信息安全领域自学条件简单，很容易跨专业自学，有所成就后看起来会比较明显。</p>
+				</article>
+				<!-- End: Post -->
+				<!-- Start: Post -->
+				<article>
+					<p>发表于:2013/09/12</p>
+					<h2>
+						<a href="#">文章标题你知道是什么吗？</a>
+					</h2>
+					<p>大部分行业干得好的人主要都是靠自学。只不过多数专业的自学都需要一定条件，非相关专业的人难以获得这些条件，所以自学而有所成就的主要是该专业的人，跨专业自学成功的不多。这就容易让大家忽略那些成功者的自学。信息安全领域自学条件简单，很容易跨专业自学，有所成就后看起来会比较明显。</p>
+				</article>
+				<!-- End: Post -->
+				<!-- Start: Post -->
+				<article>
+					<p>发表于:2013/09/12</p>
+					<h2>
+						<a href="#">文章标题你知道是什么吗？</a>
+					</h2>
+					<p>大部分行业干得好的人主要都是靠自学。只不过多数专业的自学都需要一定条件，非相关专业的人难以获得这些条件，所以自学而有所成就的主要是该专业的人，跨专业自学成功的不多。这就容易让大家忽略那些成功者的自学。信息安全领域自学条件简单，很容易跨专业自学，有所成就后看起来会比较明显。</p>
+				</article>
+				<!-- End: Post -->
+
+			</div>
+		</div>
+
+		<!-- <aside>
+			<div>
+				<div>
+					<h3>近期文章</h3>
+					<ul>
+						<li><a href="#">golang 最大连接压力测试</a></li>
+						<li><a href="#">SSL认证流程 单双向认证</a></li>
+					</ul>
+				</div>
+				<div>
+					<h3>分类目录</h3>
+					<ul>
+						<li><a href="#">Golang</a></li>
+						<li><a href="#">Java</a></li>
+					</ul>
+				</div>
+				<div>
+					<h3>标签</h3>
+					<div>
+						<a href="#">B2C案例</a> <a href="#">Golang</a>
+					</div>
+				</div>
+			</div>
+			<div>
+				<div>
+					<h3>文章归档</h3>
+					<ul>
+						<li><a href="#">2013年九月</a></li>
+						<li><a href="#">2013年八月</a></li>
+					</ul>
+				</div>
+				<div>
+					<h3>近期评论</h3>
+					<ul>
+						<li>buy nike shoes online发表在《<a href="#">Showcase</a>》
+						</li>
+						<li>Yate发表在《<a href="#">MySQL非常式双机同步数据库I</a>》
+						</li>
+					</ul>
+				</div>
+			</div>
+		</aside> -->
+
+	</section>
+
+
+	<footer>
+		<div>
+			<p>
+				Design by: <a href="#">Yate</a>
+			</p>
+		</div>
+	</footer>
+</body>
+</html>
