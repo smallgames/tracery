@@ -17,22 +17,22 @@ type GameRoom struct {
 	ID    int
 	Max   int
 	MQ    chan []byte
-	Desks []*GameDesk
+	Desks []GameDesk
 	clis  map[string]*Client
 }
 
-func NewRoom(n string, i int) *GameRoom {
-	obj := &GameRoom{Name: n,
+func NewRoom(n string, i int) GameRoom {
+	obj := GameRoom{Name: n,
 		ID:    i,
 		Max:   gr_max_online,
 		MQ:    make(chan []byte, mq_max_size),
-		Desks: make([]*GameDesk, max_desks_num),
+		Desks: make([]GameDesk, max_desks_num),
 		clis:  make(map[string]*Client),
 	}
 	return obj.builder()
 }
 
-func (self *GameRoom) builder() *GameRoom {
+func (self GameRoom) builder() GameRoom {
 	for i := 0; i < max_desks_num; i++ {
 		self.Desks[i] = NewDesk(i)
 	}

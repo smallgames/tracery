@@ -15,14 +15,14 @@ var ()
 
 type GameDesk struct {
 	ID      int
-	Players []*Client
+	Players []Client
 	MQ      chan []byte
 }
 
-func NewDesk(no int) *GameDesk {
-	return &GameDesk{
+func NewDesk(no int) GameDesk {
+	return GameDesk{
 		ID:      no,
-		Players: make([]*Client, max_player),
+		Players: make([]Client, max_player),
 		MQ:      make(chan []byte, max_mq_size),
 	}
 }

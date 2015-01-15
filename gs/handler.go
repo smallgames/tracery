@@ -1,14 +1,10 @@
 package gs
 
-import (
-	"bytes"
-	"fmt"
-	"strings"
-	"tracery/protocol"
-)
+import "fmt"
+import "tracery/protocol"
 
 func init() {
-	//fmt.Println("load gs.handler model")
+
 }
 
 const ()
@@ -16,56 +12,47 @@ const ()
 var ()
 
 type Handler interface {
-	handle(target *Client, p *protocol.Message)
+	handle(target Client, b []byte)
 }
 
-//-------------------- GameServer handle
-type GSHandler struct {
-	Self *GameServer
+type ClientHandler struct {
 }
 
-func NewGSHandler(obj *GameServer) *GSHandler {
-	return &GSHandler{
-		Self: obj,
+func NewHandler() ClientHandler {
+	return ClientHandler{}
+}
+
+func (self ClientHandler) handle(target Client, b []byte) {
+	p := protocol.Reader(b)
+	t, err := p.ReadU16()
+	if err != nil {
+		fmt.Errorf("发现未知报文")
 	}
-}
+	fmt.Println(t)
+	switch t {
+	case protocol.QUIT_PKG:
+		fmt.Println("QUIT PKG")
+		target.Close()
 
-func (self *GSHandler) handle(target *Client, p *protocol.Message) {
-	switch p.Body[0] {
-	case byte(protocol.LOGIN_PKG):
+	case protocol.LOGIN_PKG:
 		fmt.Println("Login PKG")
-		msg := strings.TrimSpace(string(p.Body[1:]))
+		msg, err := p.ReadString()
+		if err != nil {
+			fmt.Errorf("登陆GS出错", err)
+		}
 		fmt.Println(msg)
 		target.token = msg
 		target.secret = "succeed"
-
-		tocli := `{"rooms":[%s]}`
-		gr_arr := make([]string, len(self.Self.Rooms))
-		for i, v := range self.Self.Rooms {
-			gr_arr[i] = fmt.Sprintf(`{"id":%d,"name":"%v","max":%d}`, v.ID, v.Name, v.Max)
+		target.Push <- []byte("LOGIN SUCCEED")
+		fmt.Println("LOGIN SUCCEED")
+	case protocol.GO_ROOMS_PKG:
+		msg, err := p.ReadString()
+		if err != nil {
+			fmt.Errorf("登陆ROOT出错", err)
 		}
-		tocli = fmt.Sprintf(tocli, strings.Join(gr_arr, ","))
-		target.Push <- bytes.NewBufferString("server>>>" + tocli).Bytes()
-	case byte(protocol.GO_ROOMS_PKG):
-		msg := strings.TrimSpace(string(p.Body[1:]))
 		fmt.Println("???", msg)
 	default:
 		fmt.Println("Unknow package")
+		target.Close()
 	}
-}
-
-//-------------------- GameRoom handle
-type GRHandler struct {
-	Self *GameRoom
-}
-
-func NewGRHandler(obj *GameRoom) *GRHandler {
-	return &GRHandler{
-		Self: obj,
-	}
-}
-
-func (self *GRHandler) handle(target *Client, p *protocol.Message) {
-	fmt.Println("GameRoom handler analyse body :", string(p.Body))
-	target.Push <- p.Body
 }

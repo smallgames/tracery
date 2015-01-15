@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"strconv"
 	"strings"
 	"time"
-	"tracery/protocol"
 )
 
 func init() {
@@ -19,98 +17,91 @@ func init() {
 type Client struct {
 	Push chan []byte
 
-	conn     *net.Conn
+	conn     net.Conn
+	live     bool
+	end      bool
 	lest_opt int64
 	token    string
 	secret   string
 	handler  Handler
 }
 
-func NewClient(c *net.Conn, h Handler) (*Client, error) {
-	u := &Client{
+func NewClient(c net.Conn, h Handler) (*Client, error) {
+	u := Client{
 		conn:     c,
+		live:     true,
+		end:      false,
 		lest_opt: time.Now().Unix(),
 		Push:     make(chan []byte, 64),
 		handler:  h,
 	}
-	fmt.Fprint(*c, "> ")
+	fmt.Fprint(c, "> ")
 
 	go u.receive()
 	go u.send()
-	return u, nil
+	return &u, nil
 }
 
-func (self *Client) receive() {
-	pkg := &protocol.Message{Mark: protocol.NEW_PKG}
-	r := bufio.NewReader((*self.conn))
+func (self Client) receive() {
+	r := bufio.NewReader(self.conn)
 
-	for {
-		if pkg.Mark > 1 {
-			fmt.Println("receive new pkg")
-			pkg = &protocol.Message{Mark: protocol.NEW_PKG}
-		}
-
-		datas, prefix, err := r.ReadLine()
-		fmt.Println("p:", prefix)
-		fmt.Println("d:", string(datas))
+	for self.live {
+		datas, _, err := r.ReadLine()
 		if err != nil {
-			fmt.Println("11111")
 			fmt.Println(err)
 			if err != io.EOF {
-				fmt.Println("init conn declear err ", err)
-				(*self.conn).Close()
+				if !self.end {
+					self.Close()
+				}
 				break
 			}
-			pkg.Mark = protocol.ERR_PKG
-			r.Read(make([]byte, r.Buffered()))
+			if !self.end {
+				self.Close()
+			}
+			break
 			continue
 		}
 
-		body_len, err := strconv.Atoi(string(datas[:1]))
-		fmt.Println("body_len:", body_len)
-		if err != nil {
-			fmt.Println("22222")
-			pkg.Mark = protocol.ERR_PKG
-			r.Read(make([]byte, r.Buffered()))
-			continue
-		}
-
-		body := datas[1:body_len]
-		fmt.Println("body:", string(body))
+		fmt.Println("body:", string(datas))
 		if err != nil {
 			fmt.Println("33333")
 			if err != io.EOF {
-				fmt.Println("init conn declear err ", err)
-				(*self.conn).Close()
+				if !self.end {
+					self.conn.Close()
+				}
 				break
 			}
-			pkg.Mark = protocol.ERR_PKG
-			r.Read(make([]byte, r.Buffered()))
+			if !self.end {
+				self.conn.Close()
+			}
+			break
 			continue
 		}
 
-		pkg.Head = datas[1:len(datas)]
-		pkg.Body = body
-		pkg.Fin = time.Now()
-		pkg.Mark = protocol.FIN_PKG
+		go self.handler.handle(self, datas)
 
-		go self.handler.handle(self, pkg)
+		//r.Read(make([]byte, r.Buffered()))
 
-		r.Read(make([]byte, r.Buffered()))
-
-		fmt.Println("client>>>", strings.TrimSpace(string(body)))
-		fmt.Fprint((*self.conn), "> ")
+		fmt.Println("client>>>", strings.TrimSpace(string(datas)))
+		fmt.Fprint(self.conn, "server> "+strings.TrimSpace(string(datas))+"\n> ")
 	}
 }
 
-func (self *Client) send() {
-	for {
+func (self Client) send() {
+	for self.live {
 		wbs := <-self.Push
 		fmt.Println("write msg :", string(wbs))
-		i, err := (*self.conn).Write(wbs)
+		i, err := self.conn.Write(wbs)
 		if err != nil {
 			fmt.Println("send msg error :", err)
 		}
 		fmt.Println(i)
+	}
+}
+
+func (self Client) Close() {
+	self.live = false
+	if !self.end {
+		self.conn.Close()
 	}
 }

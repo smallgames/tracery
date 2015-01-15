@@ -3,7 +3,6 @@ package protocol
 import "time"
 
 func init() {
-	//fmt.Println("load msg model")
 }
 
 const (
@@ -15,18 +14,13 @@ const (
 )
 
 const (
-	LOGIN_PKG    = 48
-	GO_ROOMS_PKG = 49
-	//GET_ROOM_INFO
+	QUIT_PKG     = 12336 //00
+	LOGIN_PKG    = 12337 //01
+	GO_ROOMS_PKG = 12338 //02
 )
 
 type Message struct {
 	Mark int
 	Fin  time.Time
-	Head []byte
 	Body []byte
-}
-
-func (self *Message) Test() []byte {
-	return self.Body
 }

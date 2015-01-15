@@ -5,13 +5,13 @@ func init() {
 }
 
 type Nexus struct {
-	sessions map[string]*Client
+	sessions map[string]Client
 }
 
-func NewNexus() *Nexus {
-	return &Nexus{sessions: make(map[string]*Client)}
+func NewNexus() Nexus {
+	return Nexus{sessions: make(map[string]Client)}
 }
 
-func (self *Nexus) Add(n string, c *Client) {
+func (self Nexus) Add(n string, c Client) {
 	self.sessions[n] = c
 }

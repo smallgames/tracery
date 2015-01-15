@@ -17,23 +17,23 @@ var (
 type GameServer struct {
 	Port   int
 	Online int
-	Rooms  []*GameRoom
+	Rooms  []GameRoom
 }
 
-func NewGS(p, c int) (*GameServer, error) {
+func NewGS(p, c int) (GameServer, error) {
 	if gs_max_onlines > c {
 		c = gs_max_onlines
 	}
 
-	grooms := make([]*GameRoom, gs_max_rooms)
+	grooms := make([]GameRoom, gs_max_rooms)
 	for i := 0; i < gs_max_rooms; i++ {
 		grooms[i] = NewRoom(fmt.Sprintf("room_%d", i), i)
 	}
 
-	return &GameServer{Port: p, Online: c, Rooms: grooms}, nil
+	return GameServer{Port: p, Online: c, Rooms: grooms}, nil
 }
 
-func (self *GameServer) Run() {
+func (self GameServer) Run() {
 	tcp, err := net.ResolveTCPAddr("tcp", fmt.Sprintf(":%d", self.Port))
 	if err != nil {
 		panic(err)
@@ -48,7 +48,7 @@ func (self *GameServer) Run() {
 
 	for err == nil {
 		if c, err := l.Accept(); err == nil {
-			go NewClient(&c, NewGSHandler(self))
+			go NewClient(c, NewHandler())
 		} else {
 			fmt.Println("gs accpet err=", err)
 		}
